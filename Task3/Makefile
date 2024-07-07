@@ -4,7 +4,7 @@ SRCDIR = src
 INCDIR = include
 
 CC = gcc
-CFLAGS = -Wall -Wextra -std=c11 -I$(INCDIR)
+CFLAGS = -Wall -Wextra -std=c11 -I$(INCDIR) -g
 
 SRCS = $(wildcard $(SRCDIR)/*.c)
 

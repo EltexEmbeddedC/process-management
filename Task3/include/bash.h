@@ -12,10 +12,13 @@
 
 #define MAX_INPUT 1024
 #define MAX_ARGS 64
+#define MAX_PIPES 10
 
 void run_bash();
 void parse_input(char* input, char** args);
+void parse_command(char* command, char** args);
 void execute_command(char** args);
+void execute_pipeline(char** commands);
 void change_directory(char** args);
 void print_prompt();
 

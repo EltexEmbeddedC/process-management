@@ -1,37 +1,22 @@
 #include "../include/bash.h"
 
-void run_bash() {
-  char input[MAX_INPUT];
-  char* args[MAX_ARGS];
-
-  while (1) {
-    print_prompt();
-
-    if (fgets(input, sizeof(input), stdin) == NULL) {
-      break;
-    }
-
-    parse_input(input, args);
-
-    if (args[0] == NULL) {
-      continue;
-    }
-
-    if (strcmp(args[0], "exit") == 0) {
-      break;
-    } else if (strcmp(args[0], "cd") == 0) {
-      change_directory(args);
-    } else {
-      execute_command(args);
-    }
-  }
-}
-
-void parse_input(char* input, char** args) {
+void parse_input(char* input, char** commands) {
   char* token;
   int i = 0;
 
-  token = strtok(input, " \n");
+  token = strtok(input, "|");
+  while (token != NULL && i < MAX_PIPES - 1) {
+    commands[i++] = token;
+    token = strtok(NULL, "|");
+  }
+  commands[i] = NULL;
+}
+
+void parse_command(char* command, char** args) {
+  char* token;
+  int i = 0;
+
+  token = strtok(command, " \n");
   while (token != NULL && i < MAX_ARGS - 1) {
     args[i++] = token;
     token = strtok(NULL, " \n");
@@ -39,21 +24,40 @@ void parse_input(char* input, char** args) {
   args[i] = NULL;
 }
 
-void execute_command(char** args) {
-  pid_t pid = fork();
+void execute_pipeline(char** commands) {
+  int i = 0, in_fd = 0, fd[2];
+  pid_t pid;
+  int status;
 
-  if (pid < 0) {
-    perror("fork failed");
-    exit(EXIT_FAILURE);
-  } else if (pid == 0) {
-    if (execvp(args[0], args) < 0) {
-      perror("exec failed");
+  while (commands[i] != NULL) {
+    pipe(fd);
+    if ((pid = fork()) == -1) {
+      perror("fork failed");
       exit(EXIT_FAILURE);
-    }
-  } else {
-    int status;
-    if (waitpid(pid, &status, 0) < 0) {
-      perror("waitpid failed");
+    } else if (pid == 0) {
+      if (in_fd != 0) {
+        dup2(in_fd, STDIN_FILENO);
+        close(in_fd);
+      }
+      if (commands[i + 1] != NULL) {
+        dup2(fd[1], STDOUT_FILENO);
+      }
+      close(fd[0]);
+      close(fd[1]);
+
+      char* args[MAX_ARGS];
+      parse_command(commands[i], args);
+
+      if (execvp(args[0], args) < 0) {
+        perror("exec failed");
+        exit(EXIT_FAILURE);
+      }
+
+    } else {
+      waitpid(pid, &status, 0);
+      close(fd[1]);
+      in_fd = fd[0];
+      i++;
     }
   }
 }
@@ -76,5 +80,33 @@ void print_prompt() {
     printf("%s@%s: %s$ ", user, "shell", cwd);
   } else {
     perror("getcwd failed");
+  }
+}
+
+void run_bash() {
+  char input[MAX_INPUT];
+  char* commands[MAX_PIPES];
+  char* args[MAX_ARGS];
+
+  while (1) {
+    print_prompt();
+
+    if (fgets(input, sizeof(input), stdin) == NULL) {
+      break;
+    }
+
+    parse_input(input, commands);
+
+    if (commands[0] == NULL) {
+      continue;
+    }
+
+    if (strcmp(input, "exit") == 0) {
+      break;
+    } else if (strcmp(strtok(input, "\n"), "cd") == 0) {
+      change_directory(args);
+    } else {
+      execute_pipeline(commands);
+    }
   }
 }
