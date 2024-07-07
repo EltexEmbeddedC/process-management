@@ -77,46 +77,22 @@ message from 0: process2 died (pid = 8320)
 
 ### Задание 3. Реализовать аналог командного интерпретатора bash. При запуске программы пользователю предлагается ввести имя программы и опции запуска программы. Программа порождает процесс и в нем выполняет введенную программу с заданными опциями, ждет завершения дочернего процесса. Снова возвращается к вводу следующей программы. Выход из интерпретатора по команде exit.
 
-Запустим исполняемый файл. Протестируем перемещение между директориями, запуск системных утилит, vim, собственных бинарных файлов. В случае некорректного ввода ошибки выводятся и программа ожидает ввода следющей команды:
+Запустим исполняемый файл с названием `task3`. Протестируем перемещение между директориями, запуск системных утилит, собственных бинарных файлов. В случае некорректного ввода ошибки выводятся и программа ожидает ввода следющей команды:
 
-```
-alexey@shell: /home/alexey/Projects/Eltex/HW/process-management$ зы
-exec failed: No such file or directory
-alexey@shell: /home/alexey/Projects/Eltex/HW/process-management$ ps
-    PID TTY          TIME CMD
-   4676 pts/1    00:00:00 bash
-   5797 pts/1    00:00:00 task3
-   5800 pts/1    00:00:00 ps
-alexey@shell: /home/alexey/Projects/Eltex/HW/process-management$ ls
-bin  LICENSE  Makefile	README.md  Task1  Task2  Task3
-alexey@shell: /home/alexey/Projects/Eltex/HW/process-management$ cat LICENSE
-MIT License
+> [!IMPORTANT]
+> После выполнения задания на каналы была добавлена поддержка команд вида `ls -la | grep a | ...`.
 
-Copyright (c) 2024 EltexEmbeddedC
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-alexey@shell: /home/alexey/Projects/Eltex/HW/process-management$ cd hihi
-cd failed: No such file or directory
+```bash
+alexey@alexey-HVY-WXX9:~/Projects/Eltex/HW/process-management$ ./bin/task3
 alexey@shell: /home/alexey/Projects/Eltex/HW/process-management$ cd bin
+alexey@shell: /home/alexey/Projects/Eltex/HW/process-management/bin$ ls
+task1  task2  task3
+alexey@shell: /home/alexey/Projects/Eltex/HW/process-management/bin$ ps -A | grep task3
+  22726 pts/10   00:00:00 task3
 alexey@shell: /home/alexey/Projects/Eltex/HW/process-management/bin$ ./task1
-I'm a parent, my pid = 5805, ppid = 5797
-I'm a child, my pid = 5806, ppid = 5805
-5806 died with code 0
+I'm a parent, my pid = 22797, ppid = 22726
+I'm a child, my pid = 22798, ppid = 22797
+22798 died with code 0
 alexey@shell: /home/alexey/Projects/Eltex/HW/process-management/bin$ exit
+alexey@alexey-HVY-WXX9:~/Projects/Eltex/HW/process-management$ 
 ```
