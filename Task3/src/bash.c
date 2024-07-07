@@ -67,6 +67,7 @@ void change_directory(char** args) {
     fprintf(stderr, "cd: expected argument to \"cd\"\n");
   } else {
     if (chdir(args[1]) != 0) {
+      printf("\n\n%s\n\n", args[1]);
       perror("cd failed");
     }
   }
@@ -101,9 +102,11 @@ void run_bash() {
       continue;
     }
 
-    if (strcmp(input, "exit") == 0) {
+    if (strcmp(input, "exit\n") == 0) {
       break;
-    } else if (strcmp(strtok(input, "\n"), "cd") == 0) {
+    } else if (commands[0][0] == 'c' && commands[0][1] == 'd' &&
+               commands[0][2] == ' ') {
+      parse_command(commands[0], args);
       change_directory(args);
     } else {
       execute_pipeline(commands);
