@@ -96,6 +96,10 @@ void run_bash() {
       break;
     }
 
+    if (input[0] == '\n') {
+      continue;
+    }
+
     parse_input(input, commands);
 
     if (commands[0] == NULL) {
